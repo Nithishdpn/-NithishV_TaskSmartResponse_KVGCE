@@ -7,4 +7,17 @@ It provides a button styled with custom CSS, which, when clicked, opens the Gmai
 
 I faced a problem while using the OpenAI API for email generation. The free access limits were exceeded, and I had to submit the project to the client within the deadline. To ensure the project was completed on time, I decided to switch to the Gemini AI API
 
-Run the Script : streamlit run app.py
+Run the Script :  streamlit run app.py
+
+
+
+
+![Screenshot 2024-11-26 192204](https://github.com/user-attachments/assets/05208e19-a60a-4d43-9ee1-5540474c2554)
+
+
+![Screenshot 2024-11-26 192558](https://github.com/user-attachments/assets/af42f67b-24cb-465e-887a-2309ee47d692)
+
+
+
+![Screenshot 2024-11-26 192339](https://github.com/user-attachments/assets/fc99beba-b7af-4497-8f71-d0bf63b16471)
+
