@@ -1,26 +1,22 @@
 import streamlit as st
-import google.generativeai as genai
-import os
+import openai
 from urllib.parse import quote
- 
-api_key = "AIzaSyD06QicT-sfVtlzEKaOgtYulX5ovgicfAQ"    
-if not api_key:
-    st.error("API key for Google Generative AI is missing. Please set the environment variable 'GOOGLE_GENAI_API_KEY'.")
-else:
-    genai.configure(api_key=api_key)
 
- 
+# Set your OpenAI API key
+api_key = "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"
+if not api_key:
+    st.error("API key for OpenAI is missing. Please set the environment variable 'OPENAI_API_KEY'.")
+else:
+    openai.api_key = api_key
+
 GENERATION_CONFIG = {
     "temperature": 0.7,
+    "max_tokens": 500,
     "top_p": 0.95,
-    "top_k": 40,
-    "max_output_tokens": 500,
 }
 
- 
 st.title("Custom Email Generator")
 
- 
 st.markdown("### Input Structured Data:")
 user_input = st.text_area(
     "Paste the structured data (as shown in the example) below:",
@@ -42,45 +38,45 @@ user_input = st.text_area(
         'I just need the functionality. The budget should be $100000. Thank you!"'
     ),
 )
- 
+
 if st.button("Generate Output"):
     if user_input.strip() == "":
         st.error("Please provide structured input before generating the output.")
     else:
         with st.spinner("Generating professional email content..."):
             try:
-                
-                prompt = f"""
-                You are a professional assistant. Generate a polite and professional email response based on the following structured data.
-                Remove placeholders like '[Your Company Name/Title]' and '[Your Contact Information]', avoid using bullet points or stars (*), and format it cleanly for an email client.
-                
-                Input data:
-                {user_input}
-                
-                Make sure to end the email with 'Sincerely, Jesna' as the signature, and avoid adding any other placeholders like '[Your Name]', '[Your Title]', '[Your Company Name]', '[Your Phone Number]', or '[Your Email Address]'.
-                """
+                # Extract "From Name" from input
+                name_line = next((line for line in user_input.split('\n') if line.lower().startswith("from name")), None)
+                from_name = name_line.split(":")[1].strip() if name_line else "Jesna"
 
-                 
-                model = genai.GenerativeModel(
-                    model_name="gemini-1.5-flash",
-                    generation_config=GENERATION_CONFIG,
+                messages = [
+                    {"role": "system", "content": "You are a professional assistant specializing in writing polite and professional email responses."},
+                    {"role": "user", "content": f"""
+Generate a polite and professional email response based on the following structured data.
+Remove placeholders like '[Your Company Name/Title]' and '[Your Contact Information]', avoid using bullet points or stars (*), and format it cleanly for an email client.
+
+Input data:
+{user_input}
+
+Make sure to end the email with 'Sincerely, {from_name}' as the signature, and avoid adding any other placeholders like '[Your Name]', '[Your Title]', '[Your Company Name]', '[Your Phone Number]', or '[Your Email Address]'.
+                    """}
+                ]
+
+                response = openai.ChatCompletion.create(
+                    model="gpt-4",  # or "gpt-3.5-turbo"
+                    messages=messages,
+                    **GENERATION_CONFIG
                 )
-                chat_session = model.start_chat(history=[])
-                response = chat_session.send_message(prompt)
 
-                
-                output = response.text.strip()
+                output = response["choices"][0]["message"]["content"].strip()
 
-                 
                 st.subheader("Generated Email Content:")
                 st.text_area("Output:", output, height=300)
 
-                 
                 subject = "Re: Web Application Development Inquiry"
-                body = f"Dear Geminas Ket,\n\n{output}\n\nSincerely,\nJesna"
+                body = f"Dear Geminas Ket,\n\n{output}\n\nSincerely,\n{from_name}"
                 mailto_link = f"mailto:?subject={quote(subject)}&body={quote(body)}"
 
-                
                 st.markdown(f"""
                     <style>
                         .send-button {{
