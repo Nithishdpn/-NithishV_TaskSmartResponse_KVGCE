@@ -7,7 +7,7 @@ It provides a button styled with custom CSS, which, when clicked, opens the Gmai
 
  
 
-Run the Script :  streamlit run app.py
+Run the Script :  streamlit run app2.py
 
 
 
